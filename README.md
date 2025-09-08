@@ -1,119 +1,202 @@
-# boids #
+# Boids 🐦
 
-A lightweight JavaScript implementation of
-[boids](http://en.wikipedia.org/wiki/Boids). Its "API" is a little limited,
-but it's reasonably performant - my MacBook ran the demo with 1,000 boids at
-60 frames per second.
+一个轻量级的 TypeScript 实现的 [boids 群体行为算法](http://en.wikipedia.org/wiki/Boids)。这个库实现了经典的群体行为模拟，包括分离、对齐和凝聚三个基本规则。
 
-[check out the demo](http://hughsk.github.io/boids)
+## ✨ 特性
 
-I used an earlier, hastier version for the flocks in
-[grow.](http://github.com/hughsk/ludum-dare-26)
+- 🚀 **高性能**: 优化的算法实现，支持大量 boids 同时运行
+- 📦 **轻量级**: 极小的包体积，无外部依赖
+- 🔧 **TypeScript**: 完整的类型定义，提供优秀的开发体验
+- 🎯 **现代化**: 使用 ES6+ 和现代 JavaScript 特性
+- 🎮 **交互式**: 支持鼠标交互和动态调整参数
 
-## Installation ##
+## 📦 安装
 
-For use with [browserify](http://browserify.org):
-
-``` bash
+```bash
 npm install boids
 ```
 
-## Usage ##
+## 🚀 快速开始
 
-``` javascript
-var boids = require('boids')
-  , raf = require('raf')
+### 基本用法
 
-var flock = boids({
-  boids: 50,              // The amount of boids to use
-  speedLimit: 0,          // Max steps to take per tick
-  accelerationLimit: 1,   // Max acceleration per tick
-  separationDistance: 60, // Radius at which boids avoid others
-  alignmentDistance: 180, // Radius at which boids align with others
-  choesionDistance: 180,  // Radius at which boids approach others
-  separationForce: 0.15,  // Speed to avoid at
-  alignmentForce: 0.25,   // Speed to align with other boids
-  choesionForce: 0.1,     // Speed to move towards other boids
-  attractors: []
-})
+```typescript
+import { Boids } from 'boids';
 
-raf(window).on('data', function() {
-  ctx.fillStyle = 'black'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-  ctx.fillStyle = 'white'
-  ctx.save()
-  ctx.translate(-canvas.width/2, -canvas.height/2)
-  flock.tick()
-  flock.boids.forEach(function(boid) {
-    ctx.fillRect(boid[0], boid[1], 1, 1)
-  })
-  ctx.restore()
-})
+// 创建 boids 实例
+const flock = new Boids({
+  boids: 50,              // boid 数量
+  speedLimit: 2,          // 最大速度
+  accelerationLimit: 0.5, // 最大加速度
+  separationDistance: 60, // 分离距离
+  alignmentDistance: 180, // 对齐距离
+  cohesionDistance: 180,  // 凝聚距离
+  separationForce: 0.15,  // 分离力
+  alignmentForce: 0.25,   // 对齐力
+  cohesionForce: 0.1,     // 凝聚力
+});
+
+// 动画循环
+function animate() {
+  flock.tick(); // 执行一次模拟步进
+  
+  // 渲染 boids
+  flock.boids.forEach(boid => {
+    const [x, y] = boid;
+    // 绘制 boid...
+  });
+  
+  requestAnimationFrame(animate);
+}
+
+animate();
 ```
 
-**flock = boids([options])**
+### 添加吸引子/排斥子
 
-**flock.tick()**
+```typescript
+// 添加吸引子
+flock.addAttractor(100, 100, 50, 0.5);
 
-Moves the boid simulation forward one tick - if you're running an animation,
-you should be calling this on each frame.
+// 添加排斥子（负力值）
+flock.addAttractor(200, 200, 30, -0.3);
 
-**flock.boids**
-
-All of your boids are stored as an array of arrays, with each
-array containing the following variables for a single boid:
-
-``` javascript
-[xPosition, yPosition, xSpeed, ySpeed, xAcceleration, yAcceleration]
+// 移除吸引子
+flock.removeAttractor(0);
 ```
 
-Because the flock is just an array, it should be entirely safe for you
-to add and remove elements without any unintended side effects, provided all
-of the arrays are at least 6 elements long and contain numerical values. For
-example, you can add a new boid moving at a random speed to the origin like so:
+### 动态管理 Boids
 
-``` javascript
-flock.boids.push([0, 0, Math.random()*10-5, Math.random()*10-5, 0, 0])
+```typescript
+// 添加新的 boid
+flock.addBoid(0, 0, 2, 1); // x, y, vx, vy
+
+// 移除 boid
+flock.removeBoid(0);
+
+// 清空所有 boids
+flock.clearBoids();
 ```
 
-**flock.attractors**
+## 🎮 在线演示
 
-You can use attractors to control the flow of the boids - essentially,
-providing them with goals and obstacles. Each attractor contains:
+访问 [在线演示](https://your-demo-url.com) 查看 boids 算法的实际效果。
 
-``` javascript
-[xPosition, yPosition, radius, force]
+## 📚 API 参考
+
+### Boids 类
+
+#### 构造函数
+
+```typescript
+new Boids(options?: BoidsOptions, callback?: BoidsCallback)
 ```
 
-Note that you can use a negative value for `force` to repel boids instead of
-attracting them. Again, it should be safe to modify, add and remove these
-arrays without any surprises.
+#### 方法
 
-## Benchmark ##
+- `tick()`: 执行一次模拟步进
+- `addBoid(x, y, vx?, vy?)`: 添加新的 boid
+- `removeBoid(index)`: 移除指定索引的 boid
+- `addAttractor(x, y, radius, force)`: 添加吸引子/排斥子
+- `removeAttractor(index)`: 移除指定索引的吸引子
+- `clearBoids()`: 清空所有 boids
+- `clearAttractors()`: 清空所有吸引子
 
-Running `benchmark.js` yielded the following results in Node:
+#### 属性
+
+- `boids: BoidData[]`: boid 数据数组
+- `attractors: Attractor[]`: 吸引子/排斥子数组
+
+### 类型定义
+
+```typescript
+// Boid 数据结构
+type BoidData = [number, number, number, number, number, number];
+// [xPosition, yPosition, xSpeed, ySpeed, xAcceleration, yAcceleration]
+
+// 吸引子数据结构
+type Attractor = [number, number, number, number];
+// [xPosition, yPosition, radius, force]
+
+// 配置选项
+interface BoidsOptions {
+  boids?: number;              // boid 数量
+  speedLimit?: number;         // 最大速度限制
+  accelerationLimit?: number;  // 最大加速度限制
+  separationDistance?: number; // 分离距离
+  alignmentDistance?: number;  // 对齐距离
+  cohesionDistance?: number;   // 凝聚距离
+  separationForce?: number;    // 分离力
+  cohesionForce?: number;     // 凝聚力
+  alignmentForce?: number;     // 对齐力
+  attractors?: Attractor[];   // 吸引子数组
+}
+```
+
+## 🔬 算法原理
+
+Boids 算法基于三个简单的规则：
+
+1. **分离 (Separation)**: 避免与邻近个体碰撞
+2. **对齐 (Alignment)**: 与邻近个体保持相同方向
+3. **凝聚 (Cohesion)**: 向群体中心移动
+
+这些简单的规则组合在一起，产生了复杂的群体行为模式。
+
+## ⚡ 性能
+
+在标准测试环境下：
+
+- 50 boids: ~34,000 ticks/sec
+- 100 boids: ~10,000 ticks/sec
+- 500 boids: ~400 ticks/sec
+- 1000 boids: ~95 ticks/sec
+
+## 🛠️ 开发
+
+### 本地开发
+
+```bash
+# 克隆仓库
+git clone https://github.com/your-username/boids.git
+cd boids
+
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 构建
+npm run build
+```
+
+### 项目结构
 
 ```
-50 boids: 34013 ticks/sec
-100 boids: 10000 ticks/sec
-150 boids: 4537 ticks/sec
-200 boids: 2583 ticks/sec
-250 boids: 1653 ticks/sec
-300 boids: 1159 ticks/sec
-350 boids: 835 ticks/sec
-400 boids: 654 ticks/sec
-450 boids: 518 ticks/sec
-500 boids: 419 ticks/sec
-550 boids: 347 ticks/sec
-600 boids: 292 ticks/sec
-650 boids: 249 ticks/sec
-700 boids: 215 ticks/sec
-750 boids: 187 ticks/sec
-800 boids: 160 ticks/sec
-850 boids: 130 ticks/sec
-900 boids: 119 ticks/sec
-950 boids: 107 ticks/sec
-1000 boids: 95 ticks/sec
+src/
+├── index.ts      # 主入口文件
+├── boids.ts      # Boids 类实现
+├── types.ts      # TypeScript 类型定义
+└── demo.ts       # 演示代码
 ```
 
-I'm very much open to pull requests that can help improve performance :)
+## 📄 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件。
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+## 📝 更新日志
+
+### v3.0.0
+- 🎉 完全重写为 TypeScript
+- 🚀 使用 Vite 构建系统
+- 🔧 现代化的 API 设计
+- 📦 更好的类型支持
+- 🎮 改进的演示界面
+
+### v2.0.0
+- 原始 JavaScript 实现

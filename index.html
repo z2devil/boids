@@ -1,68 +1,107 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <title>Boids</title>
-        <meta name="viewport" content="width=device-width">
-        <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:100|Open+Sans:300' rel='stylesheet' type='text/css'>
-        <style type="text/css">
-          html, body {
-            margin:0;
-            padding:0;
-            font-family:'Open Sans', Helvetica, Arial, sans-serif;
-            color:#543D5E;
-            color:rgba(84,61,94,0.75);
-            background-color:#FFF1EB;
-          }
-          #title {
-            color:#543D5E;
-            font-size:2.5em;
-            color:rgba(84,61,94,0.9);
-            font-family: 'Roboto Slab', 'Times New Roman', Times, serif;
-            margin:0; padding:0;
-          }
-          a {
-            color:rgba(84,61,94,0.9);
-            text-decoration:none;
-            border-bottom:1px dotted #543D5E;
-          }
-          #text {
-            position:absolute;
-            max-width:300px;
-            top:16px;
-            left:16px;
-            background-color:rgba(255,241,235,0.55);
-            box-shadow:0 0 15px 5px rgba(255,241,235,0.55);
-          }
-          .source {
-            margin-bottom:0.5em;
-            font-size:14px;
-          }
-        </style>
-    </head>
-    <body>
-      <article role="main" id="text">
-        <h1 id="title">boids</h1>
-        <div id="description">
-          <p>
-            This is a lightweight 2D JavaScript implementation of Craig Reynolds'
-            <a href="http://en.wikipedia.org/wiki/Boids">Boids</a> algorithm.
-            It's a classic example of <em>emergence</em>
-            and a suprisingly simple way of mimicking
-            not only flocks, but any form of swarm or herd or crowd.
-          </p>
-          <p>
-            Right now you're watching <strong data-count>many</strong> boids being
-            simulated at <strong data-fps>60</strong> frames per second.
-          </p>
-          <p class="source">
-            <a href="http://github.com/hughsk/boids">Source on GitHub</a>
-          </p>
-        </div>
-      </article>
-      <script type="text/javascript" src="bundle.js"></script>
-    </body>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boids 群体行为演示</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #FFF1EB;
+    }
+    
+    canvas {
+      display: block;
+    }
+    
+    .info {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: #543D5E;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-width: 300px;
+    }
+    
+    .info h3 {
+      margin: 0 0 10px 0;
+      color: #543D5E;
+    }
+    
+    .info p {
+      margin: 5px 0;
+      line-height: 1.4;
+    }
+    
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+    
+    .btn {
+      background: #543D5E;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      margin: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+    
+    .btn:hover {
+      background: #6B4C7A;
+    }
+  </style>
+</head>
+<body>
+  <div class="info">
+    <h3>Boids 群体行为算法</h3>
+    <p><strong>分离 (Separation):</strong> 避免与邻近个体碰撞</p>
+    <p><strong>对齐 (Alignment):</strong> 与邻近个体保持相同方向</p>
+    <p><strong>凝聚 (Cohesion):</strong> 向群体中心移动</p>
+    <p><strong>鼠标:</strong> 移动鼠标创建吸引子</p>
+    <p><strong>性能:</strong> 系统会根据帧率自动调整 boid 数量</p>
+  </div>
+  
+  <div class="controls">
+    <button class="btn" onclick="addRandomBoids()">添加随机 Boids</button>
+    <button class="btn" onclick="clearAllBoids()">清空所有 Boids</button>
+  </div>
+
+  <script type="module" src="/src/demo.ts"></script>
+  
+  <script>
+    // 全局控制函数
+    window.addRandomBoids = function() {
+      if (window.boidsDemo && window.boidsDemo.boids) {
+        for (let i = 0; i < 10; i++) {
+          window.boidsDemo.boids.addBoid(
+            Math.random() * 100 - 50,
+            Math.random() * 100 - 50,
+            Math.random() * 6 - 3,
+            Math.random() * 6 - 3
+          );
+        }
+      }
+    };
+    
+    window.clearAllBoids = function() {
+      if (window.boidsDemo && window.boidsDemo.boids) {
+        window.boidsDemo.boids.clearBoids();
+      }
+    };
+  </script>
+</body>
 </html>
